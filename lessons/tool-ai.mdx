@@ -1,0 +1,162 @@
+---
+title: 'Building AI Tools'
+number: 10
+section: 'Dynamic Chat'
+---
+
+### 🎯 Introduction
+
+In our previous lesson, we explored the AI SDK's core components. Now, let's focus on one of its most powerful features: Tools. Tools extend what an AI can do by giving it access to external data and capabilities. In this lesson, we'll create a GitHub profile tool that developers will find genuinely useful.
+
+### 🔧 Understanding AI Tools
+
+Tools are functions that an AI can invoke when appropriate. Each tool has three key components:
+
+1. **Description** - Helps the AI understand when to use the tool
+2. **Parameters** - Defines what inputs the tool needs (using Zod for validation)
+3. **Execute function** - The actual code that runs when the tool is called
+
+### 💻 Creating a GitHub Profile Tool
+
+Let's implement a simple tool to fetch GitHub profile information:
+
+```typescript
+// app/api/chat/route.ts
+import {createOpenAI} from '@ai-sdk/openai'
+import {streamText} from 'ai'
+import {z} from 'zod'
+
+const openai = createOpenAI({
+	apiKey: process.env.OPENAI_API_KEY
+})
+
+export async function POST(req: Request) {
+	const {messages} = await req.json()
+
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		tools: {
+			getGitHubProfile: {
+				description:
+					'Get public information about a GitHub user profile',
+				parameters: z.object({
+					username: z
+						.string()
+						.describe('The GitHub username to look up')
+				}),
+				execute: async ({username}) => {
+					try {
+						const response = await fetch(
+							`https://api.github.com/users/${username}`
+						)
+
+						if (!response.ok) {
+							return {
+								error: `Failed to fetch profile: ${response.status}`
+							}
+						}
+
+						const data = await response.json()
+
+						return {
+							login: data.login,
+							name: data.name,
+							bio: data.bio,
+							public_repos: data.public_repos,
+							followers: data.followers,
+							html_url: data.html_url
+						}
+					} catch (error) {
+						return {error: 'Failed to fetch GitHub profile'}
+					}
+				}
+			}
+		}
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+### 🧠 How Tools Work: The Flow
+
+Understanding the flow of tool usage is essential:
+
+1. **User asks a question** - "What can you tell me about the GitHub user vercel?"
+2. **AI identifies tool need** - The model recognizes it needs GitHub profile data
+3. **AI selects parameters** - It extracts "vercel" as the username
+4. **Tool execution** - The execute function runs on the server
+5. **Result returned** - The GitHub profile data is returned to the model
+6. **AI formulates response** - The model creates a response using the profile data
+
+### 🔑 Key Concepts for Building Tools
+
+When building AI tools, remember these principles:
+
+1. **Single Responsibility** - Each tool should do one thing well
+2. **Clear Description** - Help the AI understand when to use the tool
+3. **Precise Parameters** - Define exactly what inputs the tool needs
+4. **Error Handling** - Handle API failures and edge cases gracefully
+5. **Return Structured Data** - Make the data easy for the AI to use
+
+### 🌐 When to Use Tools vs. Embeddings
+
+It's important to understand when to use tools versus other techniques:
+
+| Use Tools When                 | Use Embeddings (RAG) When              |
+| ------------------------------ | -------------------------------------- |
+| Accessing real-time data       | Working with static documents          |
+| Performing calculations        | Searching through knowledge bases      |
+| Interacting with external APIs | Personalizing responses with user data |
+| Running specific functions     | Handling domain-specific terminology   |
+
+### 🚀 Enabling Multi-Step Tool Calls
+
+To make tools truly useful, we need to enable multi-step execution:
+
+```typescript
+// In your chat component
+const chatOptions = useChat({
+	initialMessages,
+	maxSteps: 5 // Allow up to 5 tool calls in one interaction
+})
+```
+
+The `maxSteps` parameter allows the AI to:
+
+1. Call a tool
+2. Process the result
+3. Potentially call another tool based on that result
+
+Without this, tools would be limited to a single invocation without follow-up.
+
+### 🛠️ Tool Development Best Practices
+
+1. **Validate Inputs** - Use Zod to ensure parameters are correct
+2. **Handle Rate Limits** - External APIs often have usage limits
+3. **Keep Tools Focused** - Create multiple specialized tools rather than one complex tool
+4. **Return Useful Errors** - Error messages should help diagnose problems
+5. **Consider Caching** - Cache results when appropriate to improve performance
+
+### 💡 Tool Ideas for Developers
+
+Besides GitHub profiles, consider these developer-focused tools:
+
+1. **Package Info** - Fetch NPM/PyPI package details and documentation
+2. **Code Explanation** - Analyze code snippets from repositories
+3. **API Status** - Check if popular developer services are operational
+4. **DNS Lookup** - Perform domain name lookups
+5. **Syntax Reference** - Retrieve language syntax examples
+
+### 🎯 Conclusion
+
+Tools transform an AI chat interface from a simple text generator into a capable assistant that can interact with external systems. The key takeaways from this lesson:
+
+1. **Tools extend AI capabilities** by giving access to external data and functions
+2. **The tool structure** consists of description, parameters, and an execute function
+3. **Multi-step execution** enables complex interactions and follow-up questions
+4. **Error handling** ensures a smooth experience even when external systems fail
+5. **Developer tools** like our GitHub profile tool create practical utility
+
+In the next lesson, we'll explore how to enhance our user interface to better display tool results, making them more visually informative and useful.

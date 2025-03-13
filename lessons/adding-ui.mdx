@@ -1,0 +1,58 @@
+---
+title: 'Implementing AI-Generated UIs'
+number: 7
+section: 'UI Scaffolding'
+---
+
+### 🧠 Introduction
+
+Now that you've created a beautiful UI with v0.dev, let's implement it in a real Next.js application. In this exercise, you'll set up a new project and integrate your AI-generated interface.
+
+### Understanding Component Libraries
+
+Before we begin, it's worth understanding what makes this possible. Tools like v0.dev generate UIs using component libraries like [shadcn/ui](https://ui.shadcn.com/), which provide:
+
+- **Reusable, customizable components** - Not a traditional library, but a collection of components you own
+- **Open code** - The component code is yours to modify and adapt
+- **Composition-based design** - Components work together predictably
+- **AI-friendly architecture** - Perfect for tools like v0.dev to work with
+
+This approach allows us to generate entire interfaces and easily integrate them into our applications.
+
+### 💪 Exercise: Implementing Your AI UI
+
+#### Step 1: Create a New Next.js App
+
+```bash
+npx create-next-app@latest my-ai-chat-app
+cd my-ai-chat-app
+```
+
+Answer the setup questions (TypeScript is recommended).
+
+#### Step 2: Add Your Generated UI
+
+You have two options:
+
+**Option A: Use your own v0.dev design**
+
+- Copy the URL of your v0.dev design
+- Run this command (replace with your URL):
+
+```bash
+npx shadcn-ui@latest add "https://v0.dev/your-design-url"
+```
+
+**Option B: Use my prepared design**
+
+```bash
+npx shadcn-ui@latest add "https://v0.dev/chat/b/OBe14oxHJLs?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ZO1dnPhDCSdqtJUb.m_sUpPAbMYwQ_q12PT2bbmnJlgPfTtPWjMLH5IiqaX_CnkZdm_dlW33n.9alxUWbOG8zslDZEgQY3ug"
+```
+
+#### Step 3: Run Your App
+
+```bash
+npm run dev
+```
+
+Visit http://localhost:3000 to see your AI-generated UI in action!

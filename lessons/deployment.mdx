@@ -1,0 +1,130 @@
+---
+title: 'Deploying Your AI App to Vercel'
+number: 13
+section: 'Advanced & Deploy'
+---
+
+### 🎯 Introduction
+
+After building your AI-powered application, the next step is to share it with the world. Deployment makes your application accessible to users beyond your local development environment. In this lesson, we'll deploy our AI chat application to Vercel, a platform perfectly suited for Next.js applications with AI functionality.
+
+### 🚀 Why Vercel for AI Applications?
+
+Vercel offers several advantages for AI-powered applications:
+
+1. **Optimized for Next.js**: Since Vercel created Next.js, the platform provides excellent support for its features
+2. **Edge Functions**: Essential for streaming AI responses efficiently
+3. **Environment Variables**: Secure storage for your API keys
+4. **Serverless Architecture**: Scales automatically with demand
+5. **Vercel AI SDK Integration**: Built with Vercel's AI SDK in mind
+
+### 💻 Prerequisites for Deployment
+
+Before deploying, make sure you have:
+
+1. **A GitHub repository** with your application code
+2. **A Vercel account** (free to create at vercel.com)
+3. **API keys** for any AI services you're using (OpenAI, etc.)
+
+### 🛠️ Preparing Your Application for Deployment
+
+#### Step 1: Environment Variables
+
+Create a `.env.local` file in your project if you haven't already:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
+This file should be included in your `.gitignore` to prevent committing sensitive information:
+
+```
+# .gitignore
+.env
+.env.local
+```
+
+#### Step 2: Check for Environment Variable Usage
+
+Review your code to ensure you're using `process.env` to access environment variables:
+
+```typescript
+// app/api/chat/route.ts
+const openai = createOpenAI({
+	apiKey: process.env.OPENAI_API_KEY
+})
+```
+
+#### Step 3: Commit Your Code to GitHub
+
+If you haven't already, push your code to a GitHub repository:
+
+```bash
+git add .
+git commit -m "Prepare for deployment"
+git push
+```
+
+### 🚢 Deploying with Vercel CLI
+
+The Vercel CLI offers a quick way to deploy directly from your terminal:
+
+#### Step 1: Install Vercel CLI
+
+```bash
+npm install -g vercel
+```
+
+#### Step 2: Login to Vercel
+
+```bash
+vercel login
+```
+
+Follow the prompts to authenticate with your Vercel account.
+
+#### Step 3: Deploy Your Application
+
+From your project directory, run:
+
+```bash
+vercel
+```
+
+The CLI will guide you through a series of questions:
+
+- **Set up and deploy?** Yes
+- **Link to existing project?** No (for first deployment)
+- **Project name:** Choose a name or accept the default
+- **Root directory:** `./` (the current directory)
+
+#### Step 4: Configure Environment Variables
+
+After initial deployment, you'll need to set up your environment variables:
+
+```bash
+vercel env add OPENAI_API_KEY
+```
+
+Enter your OpenAI API key when prompted. By default, this adds the variable to all environments (production, preview, and development).
+
+#### Step 5: Deploy with Environment Variables
+
+Re-deploy your application to apply the environment variables:
+
+```bash
+vercel --prod
+```
+
+### 🔄 Continuous Deployment
+
+For future updates, you can:
+
+1. Push changes to your GitHub repository
+2. Vercel will automatically deploy the changes (if you've set up GitHub integration)
+
+Or manually deploy with:
+
+```bash
+vercel --prod
+```

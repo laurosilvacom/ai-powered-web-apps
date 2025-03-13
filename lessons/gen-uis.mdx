@@ -1,0 +1,385 @@
+---
+title: 'Building Generative UI'
+number: 11
+section: 'Dynamic Chat'
+---
+
+### 🎯 Introduction
+
+In our previous lesson, we created a GitHub profile tool to fetch user data from the GitHub API. Now, let's enhance the user experience by transforming the raw JSON output into a visually appealing component - a practice known as "Generative UI." Instead of showing users JSON data, we'll create a dedicated component to display GitHub profiles in a more engaging way.
+
+### 🎨 What is Generative UI?
+
+Generative UI connects AI tool results to specialized UI components. Benefits include:
+
+- More engaging user experiences
+- Better information visualization
+- A more native application feel
+- Clearer data presentation
+
+### 💻 Enhancing the GitHub Tool Display
+
+Currently, our GitHub tool response might look like this:
+
+```json
+{
+	"login": "vercel",
+	"name": "Vercel Inc.",
+	"bio": "Develop. Preview. Ship.",
+	"public_repos": 167,
+	"followers": 9453,
+	"html_url": "https://github.com/vercel",
+	"avatar_url": "https://avatars.githubusercontent.com/u/14985020?v=4"
+}
+```
+
+Let's transform this into a visually appealing GitHub profile card:
+
+### 💡 Step 1: Create a GitHub Profile Card Component
+
+First, let's create a dedicated component for GitHub profile data:
+
+```tsx
+// components/github-profile-card.tsx
+import {Users, BookOpen, ExternalLink} from 'lucide-react'
+
+interface GitHubProfileProps {
+	login: string
+	name: string | null
+	bio: string | null
+	public_repos: number
+	followers: number
+	html_url: string
+	avatar_url: string
+}
+
+export function GitHubProfileCard({
+	login,
+	name,
+	bio,
+	public_repos,
+	followers,
+	html_url,
+	avatar_url
+}: GitHubProfileProps) {
+	return (
+		<div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+			<div className="bg-gradient-to-r from-gray-800 to-gray-900 p-4">
+				<div className="flex items-center gap-4">
+					<img
+						src={avatar_url}
+						alt={`${login}'s avatar`}
+						className="h-16 w-16 rounded-full border-2 border-white"
+					/>
+					<div className="text-white">
+						<h3 className="text-lg font-bold">
+							{name || login}
+						</h3>
+						<p className="text-sm text-gray-300">@{login}</p>
+					</div>
+				</div>
+			</div>
+
+			<div className="p-4">
+				{bio && <p className="mb-4 text-gray-600">{bio}</p>}
+
+				<div className="mb-4 flex gap-4 text-sm">
+					<div className="flex items-center gap-1">
+						<BookOpen className="h-4 w-4 text-gray-500" />
+						<span>{public_repos} repositories</span>
+					</div>
+					<div className="flex items-center gap-1">
+						<Users className="h-4 w-4 text-gray-500" />
+						<span>{followers} followers</span>
+					</div>
+				</div>
+
+				<a
+					href={html_url}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-1 text-sm text-blue-600 hover:underline">
+					<ExternalLink className="h-3 w-3" />
+					View GitHub Profile
+				</a>
+			</div>
+		</div>
+	)
+}
+```
+
+### 💡 Step 2: Update the Chat Message Component
+
+Now let's modify our existing ChatMessage component to use the GitHubProfileCard when GitHub data is returned:
+
+```tsx
+// Modify chat-message.tsx to use the GitHubProfileCard
+import {User} from 'lucide-react'
+import {BotAvatar} from '@/components/bot-avatar'
+import {Message} from 'ai'
+import {GitHubProfileCard} from '@/components/github-profile-card' // Add this import
+
+export function ChatMessage({message}: {message: Message}) {
+	const {role, content, toolInvocations} = message
+	const hasToolCalls =
+		toolInvocations && toolInvocations.length > 0
+
+	return (
+		<div
+			className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
+			<div
+				className={`flex max-w-3xl ${role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+				{/* Avatar section (unchanged) */}
+				<div className={role === 'user' ? 'ml-3' : 'mr-3'}>
+					{role === 'user' ? (
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+							<User
+								className="h-4 w-4 text-gray-600"
+								strokeWidth={1.5}
+							/>
+						</div>
+					) : (
+						<BotAvatar />
+					)}
+				</div>
+
+				{/* Message bubble */}
+				<div
+					className={`rounded-2xl p-4 ${role === 'user' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+					{content && (
+						<p className="leading-relaxed">{content}</p>
+					)}
+
+					{/* Tool calls and results */}
+					{hasToolCalls && (
+						<div className="mt-3 space-y-3">
+							{toolInvocations.map((tool) => (
+								<div
+									key={tool.toolCallId}
+									className="rounded border border-gray-200 p-3">
+									<p className="text-xs font-semibold text-gray-500">
+										Tool: {tool.toolName}
+									</p>
+
+									{/* Parameters (unchanged) */}
+									{tool.state === 'call' && (
+										<div className="mt-2">
+											<p className="text-xs font-semibold text-gray-500">
+												Parameters:
+											</p>
+											<pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-100 p-2 text-xs">
+												{JSON.stringify(tool.args, null, 2)}
+											</pre>
+										</div>
+									)}
+
+									{/* Loading state (unchanged) */}
+									{tool.state === 'call' && (
+										<div className="mt-2 text-sm text-gray-500">
+											<div className="flex items-center space-x-2">
+												<div className="h-2 w-2 animate-pulse rounded-full bg-gray-300"></div>
+												<div
+													className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+													style={{
+														animationDelay: '150ms'
+													}}></div>
+												<div
+													className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+													style={{
+														animationDelay: '300ms'
+													}}></div>
+											</div>
+										</div>
+									)}
+
+									{/* Results - with enhanced display for GitHub profiles */}
+									{tool.state === 'result' && (
+										<div className="mt-2">
+											<p className="text-xs font-semibold text-gray-500">
+												Result:
+											</p>
+
+											{/* GitHub Card for GitHub profile tool */}
+											{tool.toolName === 'getGitHubProfile' ? (
+												<div className="mt-2">
+													<GitHubProfileCard {...tool.result} />
+												</div>
+											) : (
+												// Default display for other tools
+												<pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-100 p-2 text-xs">
+													{JSON.stringify(tool.result, null, 2)}
+												</pre>
+											)}
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	)
+}
+```
+
+### 💡 Step 3: Update the API Route
+
+To implement the GitHub profile tool, we need to update our API route:
+
+```tsx
+// app/api/chat/route.ts
+import {createOpenAI} from '@ai-sdk/openai'
+import {streamText} from 'ai'
+import {z} from 'zod'
+
+const openai = createOpenAI({
+	apiKey: process.env.OPENAI_API_KEY
+})
+
+export async function POST(req: Request) {
+	const {messages} = await req.json()
+
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		tools: {
+			getGitHubProfile: {
+				description:
+					'Get public information about a GitHub user profile',
+				parameters: z.object({
+					username: z
+						.string()
+						.describe('The GitHub username to look up')
+				}),
+				execute: async ({username}) => {
+					try {
+						// Fetch the user profile from GitHub's public API
+						const response = await fetch(
+							`https://api.github.com/users/${username}`
+						)
+
+						if (!response.ok) {
+							if (response.status === 404) {
+								return {error: `User ${username} not found`}
+							}
+							return {
+								error: `GitHub API error: ${response.status}`
+							}
+						}
+
+						const data = await response.json()
+
+						// Return selected profile information
+						return {
+							login: data.login,
+							name: data.name,
+							bio: data.bio,
+							public_repos: data.public_repos,
+							followers: data.followers,
+							following: data.following,
+							html_url: data.html_url,
+							avatar_url: data.avatar_url
+						}
+					} catch (error) {
+						return {error: 'Failed to fetch GitHub profile'}
+					}
+				}
+			},
+			getWeatherInformation: {
+				description: 'Get the current weather for a location',
+				parameters: z.object({
+					location: z
+						.string()
+						.describe('The city name, e.g., "New York"')
+				}),
+				execute: async ({location}) => {
+					// Mock weather data
+					const conditions = [
+						'sunny',
+						'cloudy',
+						'rainy',
+						'windy',
+						'snowy'
+					]
+					const temperature = Math.floor(Math.random() * 30) + 40
+
+					return {
+						location,
+						temperature: `${temperature}°F`,
+						condition:
+							conditions[
+								Math.floor(Math.random() * conditions.length)
+							]
+					}
+				}
+			}
+		}
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+### 🧠 The Key Pattern
+
+The pattern we're using is simple but powerful:
+
+1. **Check the tool type:** `tool.toolName === 'getGitHubProfile'`
+2. **Render specialized component:** `<GitHubProfileCard {...tool.result} />`
+3. **Fallback to default display:** For other tools, show the JSON
+
+This pattern can be extended to any number of tools, with each tool getting its own specialized component.
+
+### 💡 Enhanced Loading State
+
+We could also create a specialized loading state for GitHub profiles:
+
+```tsx
+// Enhanced loading state for GitHub profiles
+{
+	tool.toolName === 'getGitHubProfile' &&
+		tool.state === 'call' && (
+			<div className="mt-2 animate-pulse">
+				<div className="h-24 rounded-t-lg bg-gray-200"></div>
+				<div className="rounded-b-lg border border-t-0 border-gray-200 p-4">
+					<div className="flex items-center gap-4">
+						<div className="-mt-12 h-16 w-16 rounded-full border-2 border-white bg-gray-200"></div>
+						<div className="space-y-2">
+							<div className="h-4 w-32 rounded bg-gray-200"></div>
+							<div className="h-3 w-20 rounded bg-gray-200"></div>
+						</div>
+					</div>
+					<div className="mt-4 space-y-2">
+						<div className="h-3 w-full rounded bg-gray-200"></div>
+						<div className="h-3 w-2/3 rounded bg-gray-200"></div>
+					</div>
+				</div>
+			</div>
+		)
+}
+```
+
+### 💡 Best Practices for Generative UI
+
+When creating generative UI components:
+
+1. **Match Component Props to Tool Results** - Your component props should exactly match the tool's result structure
+2. **Handle Missing Data** - Always account for potentially missing fields with fallbacks
+3. **Show Appropriate Loading States** - Create specialized loading states that match the final component
+4. **Keep Components Focused** - Each component should display one specific type of data
+5. **Use Conditional Rendering** - Only show the specialized component for matching tools
+
+### 🎯 Conclusion
+
+Generative UI transforms AI tools from returning raw data to presenting visually engaging components. By implementing a GitHub profile card, we've created a more polished user experience that makes profile information easier to understand and more visually appealing.
+
+Key takeaways:
+
+- Specialized components make tool results more engaging and useful
+- The conditional rendering pattern connects tools to their visual representations
+- Each tool can have its own dedicated component
+- You can easily extend this pattern to other tools like getWeatherInformation
+- This approach creates a more app-like experience within your chat interface
+
+In the next lesson, we'll explore how to make these components interactive, allowing users to take actions directly within the UI, such as navigating to repositories or following users directly from the profile card.

@@ -1,0 +1,84 @@
+---
+title: 'AI Fundamentals for Developers'
+number: 5
+section: 'UI Scaffolding'
+---
+
+### 🧠 Introduction
+
+Before we start building, let's explore the AI concepts that will power our chat application. Understanding these fundamentals will help you make better design decisions and troubleshoot effectively. Don't worry - this isn't a deep dive into machine learning theory. We'll focus on the practical knowledge you need as an application developer working with AI.
+
+### 🤖 Generative AI: The Engine of Modern AI Applications
+
+Generative AI refers to models that can create new content based on patterns learned from training data. Unlike traditional algorithms that follow explicit rules, generative models can:
+
+- Generate text responses to questions or prompts
+- Create images from text descriptions
+- Transform content from one form to another (like summarizing text)
+
+Think of generative AI as a prediction system - given what it's seen before, what's the most likely appropriate response?
+
+Examples of generative AI capabilities:
+
+- Taking a photo → Generating a descriptive caption
+- Receiving an audio file → Producing a written transcript
+- Reading a text description → Creating a matching image
+
+### 📝 Large Language Models (LLMs)
+
+LLMs are a type of generative AI focused specifically on text. They work by:
+
+1. Taking a sequence of words as input
+2. Predicting the most statistically likely next words
+3. Continuing this process to generate coherent text
+
+The key insight: LLMs don't "understand" text the way humans do - they recognize patterns in data and predict what typically comes next based on their training.
+
+Popular LLMs include:
+
+- [GPT models from OpenAI](https://platform.openai.com/docs/models)
+- [Claude models from Anthropic](https://docs.anthropic.com/en/docs/about-claude/models/all-models?q=models)
+- Other...
+
+### ⚠️ Important Limitations
+
+It's crucial to understand what LLMs can and cannot do:
+
+- **Training limitations**: LLMs only know information included in their training data
+- **Hallucinations**: When asked about unfamiliar topics, LLMs may generate convincing but incorrect information
+- **Temporal cutoffs**: Most models have knowledge only up to their training cutoff date
+
+### 🔄 Provider Abstractions in AI SDK
+
+Different AI providers (OpenAI, Anthropic, etc.) have their own APIs and formats for interacting with their models. This creates challenges when:
+
+- Switching between providers
+- Experimenting with different models
+- Avoiding vendor lock-in
+
+The Vercel AI SDK solves this by providing a standardized interface, allowing you to:
+
+- Use consistent code across different AI providers
+- Switch providers with minimal code changes
+- Focus on building features rather than managing API differences
+
+Example is [t3.gg](https://t3.chat/chat)
+
+### 💬 Working with Prompts
+
+Prompts are the instructions you give to an LLM - they're your primary way of controlling AI behavior in your application. The AI SDK simplifies prompt handling by providing structured interfaces and helper functions, saving you from dealing with the complex message formats required by different providers.
+
+Different kinds of prompts include:
+
+- **System prompts**: Instructions for the AI to follow throughout the conversation
+- **User prompts**: Questions or statements from the user
+- **Assistant prompts**: Responses from the AI
+
+### 🌟 What This Means For Our Chat App
+
+In our application, we'll:
+
+- Connect to LLMs through the AI SDK's unified interface
+- Design effective prompts to shape AI responses
+- Handle streaming responses for a responsive user experience
+- Manage the conversation flow between user and AI

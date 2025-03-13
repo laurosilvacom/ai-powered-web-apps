@@ -1,0 +1,202 @@
+---
+title: 'Setting up AI Models'
+number: 9
+section: 'AI SDK Integration'
+---
+
+### 🎯 Introduction
+
+In our previous lesson, we integrated the Vercel AI SDK into our chat application. Now, let's examine how the core components work together to enable AI functionality. Understanding these pieces will help you customize your application and build more sophisticated features.
+
+### 🔬 Understanding the AI API Route
+
+The heart of our AI integration is the API route in `app/api/chat/route.ts`. Let's break down its key elements:
+
+1. **Model Setup**
+
+   ```typescript
+   const openai = createOpenAI({
+   	apiKey: 'sk-your-api-key' // Replace with actual key
+   })
+   ```
+
+   This creates an OpenAI client with our API key. In production, you would store this in environment variables.
+
+2. **Request Handling**
+
+   ```typescript
+   const {messages} = await req.json()
+   ```
+
+   This extracts the messages array from the incoming request, containing the conversation history.
+
+3. **Streaming Setup**
+
+   ```typescript
+   const result = streamText({
+   	model: openai('gpt-4o'),
+   	messages
+   	// ...
+   })
+   ```
+
+   The `streamText` function handles streaming responses, providing a better user experience as text appears progressively.
+
+4. **Tool Definition**
+
+   ```typescript
+   tools: {
+     getWeatherInformation: {
+       description: 'Get the current weather for a location',
+       parameters: z.object({
+         location: z.string().describe('The city name'),
+       }),
+       execute: async ({ location }) => {
+         // Implementation...
+       }
+     }
+   }
+   ```
+
+   This defines a tool the AI can use. The parameters use Zod schema to validate inputs, and the execute function runs when the AI calls this tool.
+
+5. **Response Streaming**
+   ```typescript
+   return result.toDataStreamResponse()
+   ```
+   This converts the streaming result into a format Next.js can return as a response.
+
+### 🔄 Chat Page Structure
+
+The chat page in `app/chat/[chatId]/page.tsx` coordinates the UI components and handles routing:
+
+1. **Message Type**
+
+   ```typescript
+   import {Message} from 'ai'
+   ```
+
+   We import the `Message` type from the AI SDK to ensure compatible message formats.
+
+2. **Initial Messages**
+
+   ```typescript
+   const chatData: Record<
+   	string,
+   	{title: string; messages: Message[]}
+   > = {
+   	// Chat data...
+   }
+   ```
+
+   We define sample conversations with the Message type, which includes `id`, `role`, and `content` fields.
+
+3. **Component Integration**
+   ```tsx
+   <ChatInterface
+   	initialMessages={chat.messages}
+   	title={chat.title}
+   />
+   ```
+   We pass the messages to our ChatInterface component, which handles AI interaction.
+
+### 🧩 AI SDK in Components
+
+The key AI SDK-specific code in our components includes:
+
+#### useChat Hook
+
+```typescript
+// From chat-interface.tsx
+const {
+	messages,
+	input,
+	handleInputChange,
+	handleSubmit,
+	isLoading,
+	error,
+	reload
+} = useChat({
+	initialMessages,
+	maxSteps: 5
+})
+```
+
+This hook provides:
+
+- State management for messages, input field, and loading status
+- Event handlers for input changes and form submission
+- Error handling and retry functionality
+- Configuration for initial messages and tool call limits
+
+#### Message Component Integration
+
+```typescript
+// From chat-message.tsx
+export function ChatMessage({message}: {message: Message}) {
+	const {role, content, toolInvocations} = message
+
+	// Component rendering...
+}
+```
+
+Our message component now handles AI-specific features like tool invocations, which display the parameters and results when the AI uses tools.
+
+### 🛠️ Customizing AI Models
+
+You can easily swap different AI models in your application:
+
+```typescript
+// OpenAI models
+model: openai('gpt-4o'),         // Latest model
+model: openai('gpt-3.5-turbo'),  // More economical
+
+// Anthropic models (requires Anthropic SDK)
+model: anthropic('claude-3-opus'),
+```
+
+### 🧪 Exercise: Supporting Model Selection
+
+Try enhancing your API route to support model selection:
+
+1. Update your API route:
+
+```typescript
+export async function POST(req: Request) {
+	const {messages, model = 'gpt-3.5-turbo'} = await req.json()
+
+	const result = streamText({
+		model: openai(model),
+		messages
+		// Other options...
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+2. Update your chat interface:
+
+```typescript
+const chatOptions = useChat({
+	initialMessages,
+	body: {
+		model: 'gpt-4o' // Can be changed based on user preference
+	}
+})
+```
+
+### 🎯 Conclusion
+
+Understanding these components gives you the foundation to build more sophisticated AI applications:
+
+1. The **API route** connects your front-end to AI models and defines tools
+2. The **Chat components** use AI SDK hooks to manage conversation state
+3. The **Message components** handle specialized AI features like tool calls
+
+With this knowledge, you can:
+
+- Switch between different AI models
+- Create custom tools for specific domains
+- Build more complex conversation flows
+- Enhance user experience with advanced features

@@ -1,0 +1,135 @@
+---
+title: 'Setting Custom AI Instructions'
+number: 12
+section: 'Dynamic Chat'
+---
+
+### 🎯 Introduction
+
+In our previous lesson, we enhanced our chat interface with visual components for displaying GitHub profiles. Now, let's explore how to improve AI responses by setting custom system instructions. These instructions shape the AI's personality and capabilities without requiring any changes to our UI components.
+
+### 🧠 What Are System Instructions?
+
+System instructions (sometimes called "system prompts") provide context and guidance to an AI model. They define:
+
+- The AI's persona or role
+- Knowledge boundaries
+- Response style and tone
+- Behavior guidelines
+
+While users never see these instructions, they significantly impact the quality and style of AI responses.
+
+### 💻 Adding System Instructions
+
+Let's update our API route to include custom system instructions:
+
+```typescript
+// app/api/chat/route.ts
+import {createOpenAI} from '@ai-sdk/openai'
+import {streamText} from 'ai'
+import {z} from 'zod'
+
+const openai = createOpenAI({
+	apiKey: process.env.OPENAI_API_KEY
+})
+
+export async function POST(req: Request) {
+	const {messages} = await req.json()
+
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		// Add system instructions
+		system: `You are a helpful developer assistant specializing in web development and GitHub.
+
+    When helping users:
+    - Keep explanations concise but thorough
+    - Include code examples when relevant
+    - Format code with proper syntax highlighting
+    - Cite sources when possible
+    - If a user asks about a GitHub profile, use the getGitHubProfile tool
+
+    Your tone should be professional but friendly. When you don't know something, admit it rather than making up information.`,
+		tools: {
+			// Tool definitions remain the same
+			getGitHubProfile: {
+				// Tool implementation...
+			}
+		}
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+### 🔑 Best Practices for System Instructions
+
+Effective system instructions follow these guidelines:
+
+1. **Be specific** - Clearly define the AI's role and expertise
+2. **Set boundaries** - Specify what the AI should or shouldn't do
+3. **Define the tone** - Establish how formal or casual responses should be
+4. **Keep it relevant** - Focus on instructions related to your use case
+5. **Avoid contradictions** - Don't give conflicting guidance
+
+### 💡 Contextualizing Tool Usage
+
+You can use system instructions to guide when and how tools are used:
+
+```typescript
+system: `You are a developer assistant with access to GitHub information.
+
+When a user mentions a GitHub username or asks about a GitHub profile:
+1. Use the getGitHubProfile tool to retrieve their information
+2. Summarize key information about their profile
+3. Highlight notable repositories or contributions if relevant
+
+Only use the GitHub tool when a specific username is mentioned or requested.`,
+```
+
+This helps the AI make better decisions about when to use available tools.
+
+### 🧪 Testing Different Instructions
+
+A great way to refine your system instructions is to create a simple testing function:
+
+```typescript
+// Different instruction sets to test
+const instructionSets = {
+	technical: `You are a technical expert focused on precise, detailed explanations...`,
+	beginner: `You are a patient teacher who explains concepts in simple terms...`,
+	concise: `You are a direct assistant who provides brief, to-the-point answers...`
+}
+
+// Add an instruction parameter to your API route
+export async function POST(req: Request) {
+	const {messages, instruction = 'technical'} = await req.json()
+
+	const systemInstruction =
+		instructionSets[
+			instruction as keyof typeof instructionSets
+		] || instructionSets.technical
+
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		system: systemInstruction
+		// Tools remain the same
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+Now you can test different instruction styles by passing an `instruction` parameter.
+
+### 🎯 Conclusion
+
+Adding custom system instructions is a simple yet powerful way to enhance your AI application. With just a few lines of code, you can significantly improve the quality, consistency, and appropriateness of AI responses.
+
+Key takeaways:
+
+- System instructions shape AI behavior without UI changes
+- Well-crafted instructions improve response quality
+- Instructions can guide tool usage decisions
+- Different instructions can serve different user needs

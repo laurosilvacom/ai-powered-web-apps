@@ -1,0 +1,592 @@
+---
+title: 'Integrating the Vercel AI SDK'
+number: 8
+section: 'AI SDK Integration'
+---
+
+### 🎯 Introduction
+
+Now that we have our beautiful UI, it's time to make it functional! In this lesson, we'll integrate the Vercel AI SDK to enable real conversations with AI models. The AI SDK simplifies working with language models, handling streaming responses, and implementing advanced features like tool calling.
+
+### 🧠 Understanding the AI SDK
+
+The Vercel AI SDK provides:
+
+- A unified interface for multiple AI models (OpenAI, Anthropic, etc.)
+- Real-time streaming of responses
+- React hooks for managing conversations
+- Tool calling functionality for extending AI capabilities
+
+### 💪 Exercise: Adding AI Functionality
+
+Your challenge is to transform your static UI into a functioning AI chat application. We need to update our existing components to work with the AI SDK.
+
+#### Step 1: Install the Required Packages
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai zod
+```
+
+#### Step 2: Create the API Route
+
+Create a new file at `app/api/chat/route.ts` to handle AI requests.
+
+#### Step 3: Update the Chat Components
+
+Looking at our existing components, we need to make the following changes:
+
+1. Update the `ChatMessage` component to support tool invocations
+2. Modify the `ChatInterface` component to use the AI SDK's `useChat` hook
+3. Ensure the types and interfaces are compatible with the AI SDK
+
+### 🔍 What to Focus On
+
+As you update the components, pay attention to:
+
+1. How the message interface needs to change to support AI SDK features
+2. The differences between our manual message handling and the AI SDK's approach
+3. How to maintain the UI appearance while upgrading the functionality
+
+### 🚀 Challenge Requirements
+
+Your implementation should:
+
+- Connect to the AI SDK while maintaining the current UI look and feel
+- Replace the setTimeout mock with real AI responses
+- Support the existing chat history display
+- Maintain scrolling behavior and loading states
+
+Let's see if you can spot what needs to change in each component!
+
+### 💡 Solution
+
+Here are the key changes needed for each component:
+
+#### 1. Create API Route (New)
+
+<details>
+<summary>View API Route Code</summary>
+
+```typescript
+// app/api/chat/route.ts
+import {createOpenAI} from '@ai-sdk/openai'
+import {streamText} from 'ai'
+import {z} from 'zod'
+
+const openai = createOpenAI({
+	apiKey: 'sk-your-api-key' // Replace with actual key
+})
+
+export async function POST(req: Request) {
+	const {messages} = await req.json()
+
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		tools: {
+			getWeatherInformation: {
+				description: 'Get the current weather for a location',
+				parameters: z.object({
+					location: z.string().describe('The city name')
+				}),
+				execute: async ({location}) => {
+					const conditions = [
+						'sunny',
+						'cloudy',
+						'rainy',
+						'windy',
+						'snowy'
+					]
+					const temperature = Math.floor(Math.random() * 30) + 40
+
+					return {
+						location,
+						temperature: `${temperature}°F`,
+						condition:
+							conditions[
+								Math.floor(Math.random() * conditions.length)
+							]
+					}
+				}
+			}
+		}
+	})
+
+	return result.toDataStreamResponse()
+}
+```
+
+</details>
+
+#### 2. Update ChatMessage Component
+
+<details>
+<summary>View Original ChatMessage Component</summary>
+
+```tsx
+import {User} from 'lucide-react'
+import {BotAvatar} from '@/components/bot-avatar'
+
+interface ChatMessageProps {
+	role: string
+	content: string
+}
+
+// Component that renders a single chat message with different styling based on sender role
+export function ChatMessage({role, content}: ChatMessageProps) {
+	return (
+		<div
+			className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
+			<div
+				className={`flex max-w-3xl ${role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+				{/* Avatar section - shows user icon or bot avatar based on message role */}
+				<div className={role === 'user' ? 'ml-3' : 'mr-3'}>
+					{role === 'user' ? (
+						// User avatar - simple gray circle with user icon
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+							<User
+								className="h-4 w-4 text-gray-600"
+								strokeWidth={1.5}
+							/>
+						</div>
+					) : (
+						// Bot avatar - custom component for AI assistant
+						<BotAvatar />
+					)}
+				</div>
+
+				{/* Message bubble - black for user messages, gray for assistant messages */}
+				<div
+					className={`rounded-2xl p-4 ${role === 'user' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+					<p className="leading-relaxed">{content}</p>
+				</div>
+			</div>
+		</div>
+	)
+}
+```
+
+</details>
+
+<details>
+<summary>View Updated ChatMessage Component</summary>
+
+```tsx
+// components/chat-message.tsx
+'use client'
+
+import {User} from 'lucide-react'
+import {BotAvatar} from '@/components/bot-avatar'
+import {Message} from 'ai' // Add this import
+
+// Update the props to use the Message type from AI SDK
+export function ChatMessage({message}: {message: Message}) {
+	const {role, content, toolInvocations} = message
+
+	return (
+		<div
+			className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
+			<div
+				className={`flex max-w-3xl ${role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+				<div className={role === 'user' ? 'ml-3' : 'mr-3'}>
+					{role === 'user' ? (
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+							<User
+								className="h-4 w-4 text-gray-600"
+								strokeWidth={1.5}
+							/>
+						</div>
+					) : (
+						<BotAvatar />
+					)}
+				</div>
+
+				<div
+					className={`rounded-2xl p-4 ${role === 'user' ? 'bg-black text-white' : 'bg-gray-50 text-black'}`}>
+					{content && (
+						<p className="leading-relaxed">{content}</p>
+					)}
+
+					{/* New code to handle tool invocations */}
+					{toolInvocations && toolInvocations.length > 0 && (
+						<div className="mt-3 space-y-3">
+							{toolInvocations.map((tool) => (
+								<div
+									key={tool.toolCallId}
+									className="rounded border border-gray-200 p-3">
+									<p className="text-xs font-semibold text-gray-500">
+										Tool: {tool.toolName}
+									</p>
+
+									{tool.state === 'call' && (
+										<div className="mt-2">
+											<p className="text-xs font-semibold text-gray-500">
+												Parameters:
+											</p>
+											<pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-100 p-2 text-xs">
+												{JSON.stringify(tool.args, null, 2)}
+											</pre>
+										</div>
+									)}
+
+									{tool.state === 'result' && (
+										<div className="mt-2">
+											<p className="text-xs font-semibold text-gray-500">
+												Result:
+											</p>
+											<pre className="mt-1 max-h-40 overflow-auto rounded bg-gray-100 p-2 text-xs">
+												{JSON.stringify(tool.result, null, 2)}
+											</pre>
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	)
+}
+```
+
+</details>
+
+#### 3. Update ChatInterface Component
+
+<details>
+<summary>View Original ChatInterface Component</summary>
+
+```tsx
+'use client'
+
+import type React from 'react'
+import {useState, useRef, useEffect} from 'react'
+import {Button} from '@/components/ui/button'
+import {Input} from '@/components/ui/input'
+import {SendIcon} from 'lucide-react'
+import {ChatMessage} from '@/components/chat-message'
+
+interface Message {
+	role: string
+	content: string
+	id?: string
+}
+
+interface ChatInterfaceProps {
+	initialMessages?: Message[]
+	title?: string
+}
+
+// Main chat interface component that handles message display and submission
+export function ChatInterface({
+	initialMessages = [],
+	title = ''
+}: ChatInterfaceProps) {
+	// State to track messages, input field value, and loading status
+	const [messages, setMessages] = useState<Message[]>(
+		initialMessages.map((msg) => ({
+			...msg,
+			id: Math.random().toString(36).substring(2, 9)
+		}))
+	)
+
+	const [inputValue, setInputValue] = useState('')
+	const [isLoading, setIsLoading] = useState(false)
+	const messagesEndRef = useRef<HTMLDivElement>(null)
+
+	// Helper function to scroll to the bottom of the chat
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({behavior: 'smooth'})
+	}
+
+	// Automatically scroll to bottom when new messages are added
+	useEffect(() => {
+		scrollToBottom()
+	}, [messages])
+
+	// Handle form submission to send new messages
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		if (!inputValue.trim() || isLoading) return
+
+		// Add user message to the chat
+		const userMessage = {
+			role: 'user',
+			content: inputValue,
+			id: Math.random().toString(36).substring(2, 9)
+		}
+		setMessages((prev) => [...prev, userMessage])
+		setInputValue('')
+		setIsLoading(true)
+
+		// Simulate AI response with a timeout (would be replaced with actual API call)
+		setTimeout(() => {
+			const assistantMessage = {
+				role: 'assistant',
+				content: 'Add AI functionality to your applicatio!',
+				id: Math.random().toString(36).substring(2, 9)
+			}
+			setMessages((prev) => [...prev, assistantMessage])
+			setIsLoading(false)
+		}, 500)
+	}
+
+	return (
+		<div className="flex h-full flex-1 flex-col overflow-hidden bg-white">
+			{/* Optional title bar shown when title prop is provided */}
+			{title && (
+				<div className="border-b border-gray-100 p-4">
+					<h1 className="text-xl font-medium">{title}</h1>
+				</div>
+			)}
+
+			{/* Main chat messages area with scrolling */}
+			<div className="flex-1 space-y-8 overflow-y-auto p-6">
+				{messages.length === 0 ? (
+					// Empty state when no messages exist yet
+					<div className="flex h-full items-center justify-center">
+						<div className="text-center">
+							<h1 className="mb-3 text-2xl font-medium">
+								Ask me anything
+							</h1>
+							<p className="leading-relaxed text-gray-500">
+								Get lightning-fast answers to your development
+								questions.
+							</p>
+						</div>
+					</div>
+				) : (
+					// Map through and display all messages
+					messages.map((message) => (
+						<div key={message.id}>
+							<ChatMessage
+								role={message.role}
+								content={message.content}
+							/>
+						</div>
+					))
+				)}
+
+				{/* Loading indicator shown while waiting for AI response */}
+				{isLoading && (
+					<div className="ml-12 flex items-center space-x-2">
+						<div className="h-2 w-2 animate-pulse rounded-full bg-gray-300"></div>
+						<div
+							className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+							style={{animationDelay: '150ms'}}></div>
+						<div
+							className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+							style={{animationDelay: '300ms'}}></div>
+					</div>
+				)}
+
+				{/* Reference element for auto-scrolling */}
+				<div ref={messagesEndRef} />
+			</div>
+
+			{/* Message input form at the bottom */}
+			<div className="border-t border-gray-100 p-4">
+				<form onSubmit={handleSubmit} className="flex space-x-2">
+					<Input
+						value={inputValue}
+						onChange={(e) => setInputValue(e.target.value)}
+						placeholder="Ask anything..."
+						className="flex-1 rounded-full border border-gray-200 py-6 focus-visible:ring-black"
+						disabled={isLoading}
+					/>
+					<Button
+						type="submit"
+						size="icon"
+						className="h-12 w-12 rounded-full bg-black hover:bg-black/90"
+						disabled={isLoading}>
+						<SendIcon className="h-5 w-5" strokeWidth={1.5} />
+					</Button>
+				</form>
+				<p className="mt-3 text-center text-xs text-gray-400">
+					Faster · Better · More Affordable
+				</p>
+			</div>
+		</div>
+	)
+}
+```
+
+</details>
+
+<details>
+<summary>View Updated ChatInterface Component</summary>
+
+```tsx
+// components/chat-interface.tsx
+'use client'
+
+import {useRef, useEffect} from 'react'
+import {Button} from '@/components/ui/button'
+import {Input} from '@/components/ui/input'
+import {SendIcon} from 'lucide-react'
+import {ChatMessage} from '@/components/chat-message'
+import {useChat} from '@ai-sdk/react' // Add this import
+import {Message} from 'ai' // Add this import
+
+// Update props to use the Message type from AI SDK
+export function ChatInterface({
+	initialMessages = [],
+	title = ''
+}: {
+	initialMessages?: Message[]
+	title?: string
+}) {
+	// Replace useState with useChat from AI SDK
+	const {
+		messages,
+		input,
+		handleInputChange,
+		handleSubmit,
+		isLoading,
+		error,
+		reload
+	} = useChat({
+		initialMessages,
+		maxSteps: 5
+	})
+
+	const messagesEndRef = useRef<HTMLDivElement>(null)
+
+	// Keep the scrolling effect
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({behavior: 'smooth'})
+	}, [messages])
+
+	return (
+		<div className="flex h-full flex-1 flex-col overflow-hidden bg-white">
+			{title && (
+				<div className="border-b border-gray-100 p-4">
+					<h1 className="text-xl font-medium">{title}</h1>
+				</div>
+			)}
+
+			<div className="flex-1 space-y-8 overflow-y-auto p-6">
+				{messages.length === 0 ? (
+					<div className="flex h-full items-center justify-center">
+						<div className="text-center">
+							<h1 className="mb-3 text-2xl font-medium">
+								Ask me anything
+							</h1>
+							<p className="leading-relaxed text-gray-500">
+								Get lightning-fast answers to your development
+								questions.
+							</p>
+						</div>
+					</div>
+				) : (
+					// Update to pass entire message object
+					messages.map((message) => (
+						<div key={message.id}>
+							<ChatMessage message={message} />
+						</div>
+					))
+				)}
+
+				{/* Add error handling */}
+				{error && (
+					<div className="rounded-md bg-red-50 p-4 text-red-800">
+						<p className="flex items-center">
+							<span className="mr-2">⚠️</span>
+							<span>An error occurred. Please try again.</span>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="ml-2"
+								onClick={(e) => {
+									e.preventDefault()
+									reload()
+								}}>
+								Retry
+							</Button>
+						</p>
+					</div>
+				)}
+
+				{isLoading && (
+					<div className="ml-12 flex items-center space-x-2">
+						<div className="h-2 w-2 animate-pulse rounded-full bg-gray-300"></div>
+						<div
+							className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+							style={{animationDelay: '150ms'}}></div>
+						<div
+							className="h-2 w-2 animate-pulse rounded-full bg-gray-300"
+							style={{animationDelay: '300ms'}}></div>
+					</div>
+				)}
+
+				<div ref={messagesEndRef} />
+			</div>
+
+			<div className="border-t border-gray-100 p-4">
+				{/* Update to use AI SDK form handling */}
+				<form onSubmit={handleSubmit} className="flex space-x-2">
+					<Input
+						value={input}
+						onChange={handleInputChange}
+						placeholder="Ask anything..."
+						className="flex-1 rounded-full border border-gray-200 py-6 focus-visible:ring-black"
+						disabled={isLoading}
+					/>
+					<Button
+						type="submit"
+						size="icon"
+						className="h-12 w-12 rounded-full bg-black hover:bg-black/90"
+						disabled={isLoading}>
+						<SendIcon className="h-5 w-5" strokeWidth={1.5} />
+					</Button>
+				</form>
+				<p className="mt-3 text-center text-xs text-gray-400">
+					Powered by AI SDK
+				</p>
+			</div>
+		</div>
+	)
+}
+```
+
+</details>
+
+#### 4. Update ChatPage Component
+
+<details>
+<summary>View ChatPage Component Updates</summary>
+
+```tsx
+// app/chat/[chatId]/page.tsx
+import {Sidebar} from '@/components/sidebar'
+import {ChatInterface} from '@/components/chat-interface'
+import {notFound} from 'next/navigation'
+import {Message} from 'ai' // Add this import
+
+// Update the type definition to use Message from AI SDK
+const chatData: Record<
+	string,
+	{title: string; messages: Message[]}
+> = {
+	// The rest of your existing chatData remains the same,
+	// but you may need to add IDs to each message if they don't have them
+	// Messages should conform to the Message type from AI SDK
+}
+```
+
+</details>
+
+### 🎉 Conclusion
+
+The key changes we made to integrate the AI SDK:
+
+1. **Created a new API route** to process AI requests
+2. **Updated the ChatMessage component** to handle tool invocations and to accept a complete message object
+3. **Replaced manual state management** with the `useChat` hook from AI SDK
+4. **Added error handling** for AI responses
+5. **Updated message types** to be compatible with the AI SDK
+
+These changes transform our static mock interface into a fully functional AI chat application while maintaining the same visual design. The power of this approach is that we've replaced the mock setTimeout code with real AI responses, streaming, and even tool calling capabilities—all without significantly changing the user interface.
+
+In the next lesson, we'll explore more advanced features of the AI SDK, including setting up different AI models and enhancing our tool functionality.
