@@ -22,7 +22,7 @@
     "help": "echo '\n\\033[1;44m\\033[1;37m 🌟 AI-POWERED WEB APPS WORKSHOP COMMANDS 🌟 \\033[0m\n\n\\033[1;46m\\033[1;30m 📦 SETUP \\033[0m\n  \\033[1;36mpnpm run setup\\033[0m       - Install all dependencies\n  \\033[1;36mpnpm run clean-install\\033[0m - Clean & reinstall everything\n\n\\033[1;45m\\033[1;37m 🚀 DEVELOPMENT (choose one) \\033[0m\n  \\033[1;32mpnpm run dev:m1-start\\033[0m   - \\033[33mModule 1 START\\033[0m\n  \\033[1;32mpnpm run dev:m1-end\\033[0m     - \\033[33mModule 1 END\\033[0m\n  \\033[1;32mpnpm run dev:m2-start\\033[0m   - \\033[33mModule 2 START\\033[0m\n  \\033[1;32mpnpm run dev:m2-end\\033[0m     - \\033[33mModule 2 END\\033[0m\n  \\033[1;32mpnpm run dev:m3-start\\033[0m   - \\033[33mModule 3 START\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-01\\033[0m  - \\033[33mModule 3 END-01\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-02\\033[0m  - \\033[33mModule 3 END-02\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-03\\033[0m  - \\033[33mModule 3 END-03\\033[0m\n  \\033[1;32mpnpm run dev:m4-end-01\\033[0m  - \\033[33mModule 4 END-01\\033[0m\n\n\\033[1;43m\\033[1;30m 🔧 UTILITIES \\033[0m\n  \\033[1;31mpnpm run clean\\033[0m       - Clean all node_modules\n  \\033[1;31mpnpm run build-all\\033[0m   - Build all modules\n  \\033[1;31mpnpm run check-deps\\033[0m  - Check dependencies\n  \\033[1;31mpnpm run help\\033[0m        - Show this help\n\n\\033[1;35m💡 TIP: Use Ctrl+C to stop the dev server\\033[0m\n\\033[1;35m🔧 TROUBLESHOOT: Run \"pnpm run clean-install\" if you have issues\\033[0m\n'"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^9.2.0"
   },
   "keywords": [
     "ai",
