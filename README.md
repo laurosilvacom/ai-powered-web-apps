@@ -3,6 +3,42 @@
 This repository contains the demo application for the O'Reilly Live Event:
 [AI-Powered Web Applications](https://www.oreilly.com/live-events/ai-powered-web-applications/0642572014610/).
 
+# 🚀 Quick Start
+
+**First time setup:**
+```bash
+# First time setup
+pnpm run setup
+```
+
+**Start any module:**
+```bash
+# Module 1
+pnpm run dev:m1-start    # Start state
+pnpm run dev:m1-end      # End state
+
+# Module 2
+pnpm run dev:m2-start    # Start state
+pnpm run dev:m2-end      # End state
+
+# Module 3
+pnpm run dev:m3-start    # Start state
+pnpm run dev:m3-end-01   # End state 1
+pnpm run dev:m3-end-02   # End state 2
+pnpm run dev:m3-end-03   # End state 3
+
+# Module 4
+pnpm run dev:m4-end-01   # End state 1
+```
+# Start any module (example)
+pnpm run dev:m1-start
+
+**Need help?**
+```bash
+# Need help?
+pnpm run help
+```
+
 ## About the Course
 
 Learn how to build and deploy fully functional AI-powered web applications using
@@ -31,6 +67,10 @@ By the end of this course, you'll be able to:
 🚠 Module 4: Advanced Features and Deployment (60m)
 
 Format: `Demo` → `Code` → `Review`
+
+## 🛠️ Available Commands
+
+Run `pnpm run help` to see all available commands with colorful output.
 
 ## Course Resources
 

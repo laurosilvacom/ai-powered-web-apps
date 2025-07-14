@@ -1,0 +1,10 @@
+packages:
+  - 'module-01/start'
+  - 'module-01/end'
+  - 'module-02/start'
+  - 'module-02/end'
+  - 'module-03/start'
+  - 'module-03/end-01'
+  - 'module-03/end-02'
+  - 'module-03/end-03'
+  - 'module-04/end-01'

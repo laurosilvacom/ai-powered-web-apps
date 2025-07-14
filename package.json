@@ -1,0 +1,37 @@
+{
+  "name": "ai-powered-web-apps-workshop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Web Applications Workshop - O'Reilly Live Event",
+  "scripts": {
+    "dev:m1-start": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 1 - START State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-01/start && pnpm run dev",
+    "dev:m1-end": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 1 - END State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-01/end && pnpm run dev",
+    "dev:m2-start": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 2 - START State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-02/start && pnpm run dev",
+    "dev:m2-end": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 2 - END State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-02/end && pnpm run dev",
+    "dev:m3-start": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 3 - START State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-03/start && pnpm run dev",
+    "dev:m3-end-01": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 3 - END-01 State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-03/end-01 && pnpm run dev",
+    "dev:m3-end-02": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 3 - END-02 State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-03/end-02 && pnpm run dev",
+    "dev:m3-end-03": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 3 - END-03 State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-03/end-03 && pnpm run dev",
+    "dev:m4-end-01": "echo '\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n\\033[1;32m🚀 LAUNCHING DEV SERVER\\033[0m\n\\033[1;33m📂 Module 4 - END-01 State\\033[0m\n\\033[1;35m🌐 http://localhost:3000\\033[0m\n\\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\033[0m\n' && cd module-04/end-01 && pnpm run dev",
+    "install-all": "pnpm install --recursive",
+    "clean": "pnpm --recursive exec -- rm -rf node_modules .next",
+    "clean-install": "pnpm run clean && pnpm run install-all",
+    "setup": "pnpm install-all && echo '\n\\033[1;42m\\033[1;30m ✅ SETUP COMPLETE! \\033[0m\n\\033[1;32m🎉 All dependencies installed successfully!\\033[0m\n' && pnpm run help",
+    "build-all": "echo '\n\\033[1;33m🏗️ Building all modules (installing dependencies first)...\\033[0m\n' && pnpm install-all && pnpm --recursive run build && echo '\n\\033[1;42m\\033[1;30m ✅ BUILD COMPLETE! \\033[0m\n'",
+    "check-deps": "echo '\n\\033[1;34m🔍 Checking workspace dependencies...\\033[0m\n' && pnpm list --recursive --depth=0",
+    "help": "echo '\n\\033[1;44m\\033[1;37m 🌟 AI-POWERED WEB APPS WORKSHOP COMMANDS 🌟 \\033[0m\n\n\\033[1;46m\\033[1;30m 📦 SETUP \\033[0m\n  \\033[1;36mpnpm run setup\\033[0m       - Install all dependencies\n  \\033[1;36mpnpm run clean-install\\033[0m - Clean & reinstall everything\n\n\\033[1;45m\\033[1;37m 🚀 DEVELOPMENT (choose one) \\033[0m\n  \\033[1;32mpnpm run dev:m1-start\\033[0m   - \\033[33mModule 1 START\\033[0m\n  \\033[1;32mpnpm run dev:m1-end\\033[0m     - \\033[33mModule 1 END\\033[0m\n  \\033[1;32mpnpm run dev:m2-start\\033[0m   - \\033[33mModule 2 START\\033[0m\n  \\033[1;32mpnpm run dev:m2-end\\033[0m     - \\033[33mModule 2 END\\033[0m\n  \\033[1;32mpnpm run dev:m3-start\\033[0m   - \\033[33mModule 3 START\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-01\\033[0m  - \\033[33mModule 3 END-01\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-02\\033[0m  - \\033[33mModule 3 END-02\\033[0m\n  \\033[1;32mpnpm run dev:m3-end-03\\033[0m  - \\033[33mModule 3 END-03\\033[0m\n  \\033[1;32mpnpm run dev:m4-end-01\\033[0m  - \\033[33mModule 4 END-01\\033[0m\n\n\\033[1;43m\\033[1;30m 🔧 UTILITIES \\033[0m\n  \\033[1;31mpnpm run clean\\033[0m       - Clean all node_modules\n  \\033[1;31mpnpm run build-all\\033[0m   - Build all modules\n  \\033[1;31mpnpm run check-deps\\033[0m  - Check dependencies\n  \\033[1;31mpnpm run help\\033[0m        - Show this help\n\n\\033[1;35m💡 TIP: Use Ctrl+C to stop the dev server\\033[0m\n\\033[1;35m🔧 TROUBLESHOOT: Run \"pnpm run clean-install\" if you have issues\\033[0m\n'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "ai",
+    "nextjs",
+    "vercel-ai-sdk",
+    "workshop",
+    "education",
+    "oreilly"
+  ],
+  "author": "Lauro Silva, LLC",
+  "license": "MIT"
+}
